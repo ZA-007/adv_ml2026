@@ -135,3 +135,6 @@ plt.show()
 print(df.groupby("fcm_cluster")[features].mean().round(1))
 
 
+#optional hierarchal clustering
+
+from sklearn.cluster import AgglomerativeClustering
