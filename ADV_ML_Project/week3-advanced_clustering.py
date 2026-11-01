@@ -89,6 +89,17 @@ df["fcm_max_membership"] = U.max(axis=1)
 sorted_U = np.sort(U, axis=1)
 df["fcm_membership_gap"] = sorted_U[:, -1] - sorted_U[:, -2]
 
+#U.argmax(axis=1)	Finds the cluster with the highest membership for each observation.
+#U.max(axis=1)	Gets each observation's highest membership value.
+#np.sort(U, axis=1)	Sorts each row's membership values from lowest to highest.
+#sorted_U[:, -1]	Selects the highest membership in each row.
+#sorted_U[:, -2]	Selects the second-highest membership.
+#fcm_membership_gap	Calculates the difference between the top two memberships.
+
+#argmax gives FCM a single label for each customer by selecting the strongest membership.
+# That's why your notes call this a provisional hard label: the original FCM result is fuzzy, but this line converts it into a single cluster label for convenient comparison and plotting.
+
+
 #this code was used to find the three observations with the lowest maximum memberships
 print(df.nsmallest(3, "fcm_max_membership"))
 
@@ -138,3 +149,18 @@ print(df.groupby("fcm_cluster")[features].mean().round(1))
 #optional hierarchal clustering
 
 from sklearn.cluster import AgglomerativeClustering
+
+# <--- Use the same 'chosen_k' you used for K-means
+hier = AgglomerativeClustering(n_clusters=k, linkage="ward")
+df["hierarchical_cluster"] = hier.fit_predict(X_scaled)
+
+# 1. Profile hierarchical clusters in original units
+print("\n--- HIERARCHICAL CLUSTERING PROFILES ---")
+print(df.groupby("hierarchical_cluster")[features].mean().round(1)) #avergae for age, annual income and speniding score
+print(df["hierarchical_cluster"].value_counts().sort_index())
+
+# 2. Visualize Hierarchical Clusters
+plt.figure(figsize=(7, 5))
+sns.scatterplot(data=df, x=features[1], y=features[2], hue="hierarchical_cluster", palette="tab10")
+plt.title("Hierarchical Clustering (Ward Linkage)")
+plt.show()
